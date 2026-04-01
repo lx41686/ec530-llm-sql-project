@@ -36,7 +36,7 @@ def test_build_prompt_includes_user_query_and_schema():
 
     assert "show all users" in prompt
     assert "users (id, name, age)" in prompt
-    assert "Only generate a single SELECT query." in prompt
+    assert "Only generate ONE SELECT statement" in prompt
 
 
 def test_generate_sql_returns_llm_response():

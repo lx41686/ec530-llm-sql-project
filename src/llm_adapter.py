@@ -11,8 +11,8 @@ class LLMResponse:
 
 
 class LLMAdapter:
-    def __init__(self, client: OpenAI | None = None, model: str | None = None) -> None:
-        self.client = client or OpenAI()
+    def __init__(self, client=None, model: str | None = None) -> None:
+        self.client = client
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-5.2")
 
     def build_schema_prompt(self, schema_context: dict[str, list[str]]) -> str:
@@ -31,23 +31,38 @@ class LLMAdapter:
 
         return (
             "You are an AI assistant that converts natural language questions into SQLite SQL queries.\n"
-            "Only generate a single SELECT query.\n"
-            "Do not generate INSERT, UPDATE, DELETE, DROP, ALTER, or multiple statements.\n"
-            "Use only table names and column names that exist in the provided schema.\n"
-            "Return only the SQL query, with no markdown and no explanation.\n\n"
+            "Rules:\n"
+            "- Only generate ONE SELECT statement\n"
+            "- Use only provided table and column names\n"
+            "- Do NOT hallucinate tables or columns\n"
+            "- Do NOT include explanation\n"
+            "- Output ONLY SQL\n\n"
             f"{schema_description}\n\n"
             f'User query: "{user_query}"'
         )
 
+    def _get_client(self):
+        """Lazily create the real OpenAI client only when needed."""
+        if self.client is None:
+            self.client = OpenAI()
+        return self.client
+
     def generate_sql(self, user_query: str, schema_context: dict[str, list[str]]) -> LLMResponse:
-        """Generate SQL from a natural language query using the OpenAI Responses API."""
+        """Generate SQL from a natural language query."""
         prompt = self.build_prompt(user_query, schema_context)
+        client = self._get_client()
 
-        response = self.client.responses.create(
-            model=self.model,
-            input=prompt,
-        )
+        # Support fake test clients with a simple generate(prompt) method.
+        if hasattr(client, "generate"):
+            sql = client.generate(prompt).strip()
+        else:
+            response = client.responses.create(
+                model=self.model,
+                input=prompt,
+            )
+            sql = response.output_text.strip()
 
-        sql = response.output_text.strip()
+        if sql.startswith("```"):
+            sql = sql.replace("```sql", "").replace("```", "").strip()
 
         return LLMResponse(sql=sql)
