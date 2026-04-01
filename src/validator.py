@@ -1,7 +1,21 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class ValidationResult:
+    is_valid: bool
+    error_message: str | None = None
+
+
 class SQLValidator:
     def is_select_query(self, sql: str) -> bool:
-        """
-        Only allow SELECT
-        """
-        # Before checking: remove spaces, change to upper letters if not
-        return sql.strip().upper().startswith("SELECT")  # sql is an input string
+        return sql.strip().upper().startswith("SELECT")
+
+    def validate(self, sql: str) -> ValidationResult:
+        if not self.is_select_query(sql):
+            return ValidationResult(
+                is_valid=False,
+                error_message="Only SELECT queries are allowed.",
+            )
+
+        return ValidationResult(is_valid=True)
