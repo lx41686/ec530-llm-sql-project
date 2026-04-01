@@ -11,7 +11,7 @@ def test_connect_creates_connection():
 
 
 def test_execute_script_and_list_tables():
-    db = DatabaseManager(":memory:")
+    db = DatabaseManager(":memory:")  # create db in memory, no file created
     db.connect()
 
     db.execute_script(
@@ -27,7 +27,7 @@ def test_execute_script_and_list_tables():
 
     assert "users" in tables
 
-    db.close()
+    db.close()  # release memory
 
 
 def test_execute_select_returns_rows():
@@ -51,4 +51,3 @@ def test_execute_select_returns_rows():
     assert rows == [("Alice",), ("Bob",)]
 
     db.close()
-    
