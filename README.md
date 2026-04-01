@@ -138,14 +138,14 @@ pip install -r requirements.txt
 
 Create a `.env` file:
 
-‘’‘
+'''
 OPENAI_API_KEY=your_api_key
 OPENAI_MODEL=gpt-5.2
-’‘’
+'''
 
 ### 3. Run the system
 
-‘’‘python
+'''python
 python -m src.main
 '''
 
