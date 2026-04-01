@@ -8,6 +8,7 @@ def test_normalize_column_name():
     db = DatabaseManager(":memory:")
     schema_manager = SchemaManager(db)
 
+    # test is spaces are removed and upper cases are changed to lower
     normalized = schema_manager.normalize_column_name(" User Name ")
 
     assert normalized == "user_name"
@@ -78,4 +79,3 @@ def test_get_existing_schema():
     ]
 
     db.close()
-    
