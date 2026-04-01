@@ -44,6 +44,30 @@ def test_extract_table_names_returns_tables_from_join_clause():
     assert tables == ["users", "orders"]
 
 
+def test_extract_selected_columns_returns_star():
+    validator = SQLValidator()
+
+    columns = validator.extract_selected_columns("SELECT * FROM users")
+
+    assert columns == ["*"]
+
+
+def test_extract_selected_columns_returns_simple_column_names():
+    validator = SQLValidator()
+
+    columns = validator.extract_selected_columns("SELECT name, age FROM users")
+
+    assert columns == ["name", "age"]
+
+
+def test_extract_selected_columns_handles_table_prefixed_columns():
+    validator = SQLValidator()
+
+    columns = validator.extract_selected_columns("SELECT users.name, users.age FROM users")
+
+    assert columns == ["name", "age"]
+
+
 def test_validate_returns_invalid_for_non_select_query():
     validator = SQLValidator()
 
@@ -83,12 +107,37 @@ def test_validate_returns_invalid_for_unknown_table():
     )
 
 
-def test_validate_returns_valid_for_known_table():
+def test_validate_returns_invalid_for_unknown_column():
+    validator = SQLValidator()
+
+    result = validator.validate(
+        "SELECT salary FROM users",
+        {"users": ["id", "name", "age"]},
+    )
+
+    assert result == ValidationResult(
+        is_valid=False,
+        error_message="Unknown column referenced: salary",
+    )
+
+
+def test_validate_returns_valid_for_known_column_selection():
+    validator = SQLValidator()
+
+    result = validator.validate(
+        "SELECT name, age FROM users",
+        {"users": ["id", "name", "age"]},
+    )
+
+    assert result == ValidationResult(is_valid=True)
+
+
+def test_validate_returns_valid_for_select_star():
     validator = SQLValidator()
 
     result = validator.validate(
         "SELECT * FROM users",
-        {"users": ["id", "name"]},
+        {"users": ["id", "name", "age"]},
     )
 
     assert result == ValidationResult(is_valid=True)
