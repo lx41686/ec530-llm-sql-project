@@ -2,6 +2,7 @@ import pytest
 
 from src.db import DatabaseManager
 from src.query_service import QueryService
+from src.schema_manager import SchemaManager
 from src.validator import SQLValidator
 
 
@@ -22,7 +23,8 @@ def test_run_sql_query_returns_rows_for_valid_select():
     )
 
     validator = SQLValidator()
-    query_service = QueryService(db, validator)
+    schema_manager = SchemaManager(db)
+    query_service = QueryService(db, validator, schema_manager)
 
     rows = query_service.run_sql_query("SELECT name FROM users ORDER BY id")
 
@@ -36,10 +38,25 @@ def test_run_sql_query_raises_error_for_invalid_query():
     db.connect()
 
     validator = SQLValidator()
-    query_service = QueryService(db, validator)
+    schema_manager = SchemaManager(db)
+    query_service = QueryService(db, validator, schema_manager)
 
     with pytest.raises(ValueError, match="Only SELECT queries are allowed."):
         query_service.run_sql_query("DELETE FROM users")
+
+    db.close()
+
+
+def test_run_sql_query_raises_error_for_unknown_table():
+    db = DatabaseManager(":memory:")
+    db.connect()
+
+    validator = SQLValidator()
+    schema_manager = SchemaManager(db)
+    query_service = QueryService(db, validator, schema_manager)
+
+    with pytest.raises(ValueError, match="Unknown table referenced: orders"):
+        query_service.run_sql_query("SELECT * FROM orders")
 
     db.close()
 
@@ -63,7 +80,8 @@ def test_list_tables_returns_existing_tables():
     )
 
     validator = SQLValidator()
-    query_service = QueryService(db, validator)
+    schema_manager = SchemaManager(db)
+    query_service = QueryService(db, validator, schema_manager)
 
     tables = query_service.list_tables()
 
