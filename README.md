@@ -130,9 +130,9 @@ The project includes unit tests for all core modules:
 
 ### 1. Install dependencies
 
-‘’‘
+```
 pip install -r requirements.txt
-’‘’
+```
 
 ### 2. Set up environment variables
 
