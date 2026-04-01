@@ -93,8 +93,11 @@ It enforces the following rules:
 ### Example
 
 SELECT name FROM users;        ✅ Allowed
+
 DELETE FROM users;             ❌ Rejected
+
 SELECT salary FROM users;      ❌ Rejected (unknown column)
+
 SELECT * FROM orders;          ❌ Rejected (unknown table)
 
 ## 🤖 LLM Integration
