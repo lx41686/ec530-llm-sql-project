@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+
 from src.cli import CLI
 from src.data_loader import DataLoader
 from src.db import DatabaseManager
@@ -7,18 +9,15 @@ from src.schema_manager import SchemaManager
 from src.validator import SQLValidator
 
 
-class FakeLLMClient:
-    def generate(self, prompt: str) -> str:
-        raise ValueError("No real LLM client configured yet.")
-
-
 def main() -> None:
+    load_dotenv()
+
     db_manager = DatabaseManager("app.db")
     db_manager.connect()
 
     schema_manager = SchemaManager(db_manager)
     validator = SQLValidator()
-    llm_adapter = LLMAdapter(client=FakeLLMClient())
+    llm_adapter = LLMAdapter()
     data_loader = DataLoader(db_manager, schema_manager)
     query_service = QueryService(
         db_manager=db_manager,
