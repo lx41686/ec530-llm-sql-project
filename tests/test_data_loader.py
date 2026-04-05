@@ -58,3 +58,6 @@ def test_load_csv_creates_table_and_inserts_rows(tmp_path):
     assert rows == [("Alice", 25, 95.5), ("Bob", 30, 88.0)]
 
     db.close()
+
+# 如果是name统一大写开头，后面全小写
+# 如果是age，不能有小数点？
