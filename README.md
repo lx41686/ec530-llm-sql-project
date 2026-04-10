@@ -11,6 +11,9 @@ This project implements a modular data system that allows users to:
 
 The system follows a modular architecture with strict separation of concerns.
 
+<img width="1339" height="760" alt="Screenshot 2026-04-09 at 23 05 02" src="https://github.com/user-attachments/assets/17ffe79e-220f-4f73-a14b-a29aad6ef0ce" />
+
+
 ### Main Components
 
 - **CLI Interface**
