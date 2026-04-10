@@ -203,38 +203,8 @@ def test_run_natural_language_query_raises_error_for_invalid_generated_sql():
 
     db.close()
 
-def test_case_insensitive_query():
-    """Test that a case-sensitive SQL query"""
-    db = DatabaseManager(":memory:")
-    db.connect()
-
-    db.execute_script(
-        """
-        CREATE TABLE users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            age INTEGER
-        );
-
-        INSERT INTO users (name, age) VALUES ('Alice', 25);
-        """
-    )
-
-    validator = SQLValidator()
-    schema_manager = SchemaManager(db)
-
-    fake_llm = FakeLLMAdapter("SELECT age FROM users WHERE name = 'alice'")
-
-    query_service = QueryService(db, validator, schema_manager, fake_llm)
-
-    sql, rows = query_service.run_natural_language_query("age of alice")
-
-    assert rows == [(25,)]
-
-    db.close()
-
-# def test_case_insensitive_query_fixed():
-#     """Test that a refined SQL query using LOWER() correctly handles case-insensitive matching."""
+# def test_case_insensitive_query():
+#     """Test that a case-sensitive SQL query"""
 #     db = DatabaseManager(":memory:")
 #     db.connect()
 #
@@ -253,10 +223,7 @@ def test_case_insensitive_query():
 #     validator = SQLValidator()
 #     schema_manager = SchemaManager(db)
 #
-#     # fixed by adding LOWER(name)
-#     fake_llm = FakeLLMAdapter(
-#         "SELECT age FROM users WHERE LOWER(name) = LOWER('alice')"
-#     )
+#     fake_llm = FakeLLMAdapter("SELECT age FROM users WHERE name = 'alice'")
 #
 #     query_service = QueryService(db, validator, schema_manager, fake_llm)
 #
@@ -265,3 +232,36 @@ def test_case_insensitive_query():
 #     assert rows == [(25,)]
 #
 #     db.close()
+
+def test_case_insensitive_query_fixed():
+    """Test that a refined SQL query using LOWER() correctly handles case-insensitive matching."""
+    db = DatabaseManager(":memory:")
+    db.connect()
+
+    db.execute_script(
+        """
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            age INTEGER
+        );
+
+        INSERT INTO users (name, age) VALUES ('Alice', 25);
+        """
+    )
+
+    validator = SQLValidator()
+    schema_manager = SchemaManager(db)
+
+    # fixed by adding LOWER(name)
+    fake_llm = FakeLLMAdapter(
+        "SELECT age FROM users WHERE LOWER(name) = LOWER('alice')"
+    )
+
+    query_service = QueryService(db, validator, schema_manager, fake_llm)
+
+    sql, rows = query_service.run_natural_language_query("age of alice")
+
+    assert rows == [(25,)]
+
+    db.close()
