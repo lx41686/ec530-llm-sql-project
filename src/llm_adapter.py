@@ -33,7 +33,6 @@ class LLMAdapter:
             "You are an AI assistant that converts natural language questions into SQLite SQL queries.\n"
             "Rules:\n"
             "- Only generate ONE SELECT statement\n"
-            "- When comparing text values, use LOWER(column) = LOWER(value) for case-insensitive matching\n"
             "- Use only provided table and column names\n"
             "- Do NOT hallucinate tables or columns\n"
             "- Do NOT include explanation\n"

@@ -202,3 +202,34 @@ def test_run_natural_language_query_raises_error_for_invalid_generated_sql():
         query_service.run_natural_language_query("delete all users")
 
     db.close()
+
+
+def test_case_insensitive_query():
+    """Test that a case-sensitive SQL query"""
+    db = DatabaseManager(":memory:")
+    db.connect()
+
+    db.execute_script(
+        """
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            age INTEGER
+        );
+
+        INSERT INTO users (name, age) VALUES ('Alice', 25);
+        """
+    )
+
+    validator = SQLValidator()
+    schema_manager = SchemaManager(db)
+
+    fake_llm = FakeLLMAdapter("SELECT age FROM users WHERE name = 'alice'")
+
+    query_service = QueryService(db, validator, schema_manager, fake_llm)
+
+    sql, rows = query_service.run_natural_language_query("age of alice")
+
+    assert rows == []   # ❌ 失败点
+
+    db.close()
