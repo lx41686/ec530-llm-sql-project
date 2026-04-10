@@ -4,7 +4,17 @@ from src.db import DatabaseManager
 from src.schema_manager import SchemaManager, TableSchema, ColumnSchema
 
 
+# These tests verify that the system can understand data structure and convert it into SQL schema.
+# DataFrame → Schema → SQL → DB schema
+
+# CSV → DataFrame → Schema → SQL → DB
+#            ↑                ↓
+#         normalize       read back
+
 def test_normalize_column_name():
+    """
+    To test if names are normalized
+    """
     db = DatabaseManager(":memory:")
     schema_manager = SchemaManager(db)
 
@@ -15,6 +25,9 @@ def test_normalize_column_name():
 
 
 def test_infer_schema_from_dataframe():
+    """
+    To test DataFrame → Schema
+    """
     db = DatabaseManager(":memory:")
     schema_manager = SchemaManager(db)
 
@@ -35,6 +48,10 @@ def test_infer_schema_from_dataframe():
 
 
 def test_generate_create_table_sql():
+    """
+    To test Schema → SQL（CREATE TABLE）
+    :return:
+    """
     db = DatabaseManager(":memory:")
     schema_manager = SchemaManager(db)
 
@@ -55,6 +72,9 @@ def test_generate_create_table_sql():
 
 
 def test_get_existing_schema():
+    """
+    To test if we can read schema from db
+    """
     db = DatabaseManager(":memory:")
     db.connect()
 
@@ -73,6 +93,7 @@ def test_get_existing_schema():
 
     assert schema is not None
     assert schema.table_name == "users"
+    # This does not include id
     assert schema.columns == [
         ColumnSchema(name="name", data_type="TEXT"),
         ColumnSchema(name="age", data_type="INTEGER"),

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import re
 
 
+# The validator ensures that only safe and valid SQL queries are executed.
 @dataclass
 class ValidationResult:
     is_valid: bool

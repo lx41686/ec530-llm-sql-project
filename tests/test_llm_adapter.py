@@ -1,6 +1,7 @@
 from src.llm_adapter import LLMAdapter, LLMResponse
 
 
+# These tests verify that the LLMAdapter correctly builds prompts and interacts with an LLM client.
 class FakeLLMClient:
     def __init__(self, response: str) -> None:
         self.response = response
@@ -12,6 +13,11 @@ class FakeLLMClient:
 
 
 def test_build_schema_prompt_includes_tables_and_columns():
+    """Test that build_schema_prompt includes all tables and their columns.
+
+    This verifies that the schema context is correctly formatted and embedded
+    into the prompt so the LLM can generate accurate SQL queries.
+    """
     adapter = LLMAdapter()
 
     schema_context = {
@@ -26,6 +32,11 @@ def test_build_schema_prompt_includes_tables_and_columns():
 
 
 def test_build_prompt_includes_user_query_and_schema():
+    """Test that build_prompt includes the user query, schema context, and instructions.
+
+    This ensures that the generated prompt contains all necessary information
+    for the LLM to produce correct and safe SQL queries.
+    """
     adapter = LLMAdapter()
 
     schema_context = {
@@ -40,6 +51,10 @@ def test_build_prompt_includes_user_query_and_schema():
 
 
 def test_generate_sql_returns_llm_response():
+    """Test that generate_sql returns the SQL produced by the LLM client.
+
+    This verifies that the adapter correctly wraps the LLM output into an LLMResponse object.
+    """
     fake_client = FakeLLMClient("SELECT name FROM users;")
     adapter = LLMAdapter(client=fake_client)
 
@@ -53,6 +68,11 @@ def test_generate_sql_returns_llm_response():
 
 
 def test_generate_sql_passes_prompt_to_client():
+    """Test that generate_sql passes the correct prompt to the LLM client.
+
+    This ensures that the constructed prompt includes the user query and schema context
+    before being sent to the LLM.
+    """
     fake_client = FakeLLMClient("SELECT * FROM users;")
     adapter = LLMAdapter(client=fake_client)
 

@@ -23,7 +23,7 @@ def main() -> None:
 
     # "app.db" if the SQLite file name, create if not exit
     db_manager = DatabaseManager("app.db")  # Create db manager object
-    db_manager.connect()  # connect to db
+    db_manager.connect()  # connect to db -> create app.db if not exist
 
     schema_manager = SchemaManager(db_manager)  # create schema manager, relies on DB manager
     validator = SQLValidator()  # validator doesn't rely on DB
